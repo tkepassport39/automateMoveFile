@@ -6,7 +6,7 @@ import time
 
 
 while True:
-    #print("tick")
+    print("tick")
     # get today's date
     d = datetime.datetime.today()
     # set date format
@@ -15,11 +15,14 @@ while True:
     # get user currently signed in
     checkUser = getpass.getuser()
 
-    # setup directory
+    # src directory
     downloadsPath = "/Users/" + checkUser + "/Downloads/"
 
+    # GIMP directory
+    gimpDir = "/Users/" + checkUser + "/Pictures/GIMP/downloads/"
+
     # pictures directory
-    picturesDir = "/Users/" + checkUser + "/Pictures/GIMP/downloaded/"
+    picDir = "/Users/" + checkUser + "/Pictures/"
 
     # list of extension to look for
     ext = [
@@ -30,24 +33,40 @@ while True:
 
     # get list of files from src folder
     filesSrc = os.listdir(downloadsPath)
-    # get list of files from dst folder
-    filesDst = os.listdir(picturesDir)
-
+    # get list of files from dst gimp folder
+    filesDst = os.listdir(gimpDir)
     # sort all files in src folder
     filesSrc.sort()
-    # get the count of files inside dst folder exclude hidden files
-    dstFileCount = len([f for f in os.listdir(picturesDir) if not f.startswith('.')])
+    # get the count of files inside dst gimp folder exclude hidden files
+    dstGimpFileCount = len([f for f in os.listdir(gimpDir) if not f.startswith('.')])
 
     # search for files in downloads with following extensions
     for f in filesSrc:
         if f.endswith(tuple(ext)):
-            # increment file num count
-            dstFileCount += 1
-            extension = os.path.splitext(f)[1]
-            src = downloadsPath+f
-            # rename file
-            dst = picturesDir + str(dstFileCount) + "_pic_" + d.strftime('%m_%d_%Y') + extension
-            shutil.move(src, dst)
+            filename = os.path.splitext(f)[0]
+            src = downloadsPath + f
+
+            # extract if it starts with "gimp." and drop in gimp folder
+            if filename.startswith('gimp.'):
+                # increase file num count
+                dstGimpFileCount += 1
+                # remove "gimp." from file name
+                gimpString = filename.replace("gimp.", "")
+                # grab file extension
+                extension = os.path.splitext(f)[1]
+                # rename file
+                dst = gimpDir + str(dstGimpFileCount) + "_" + gimpString + "_" + d.strftime('%m_%d_%Y') + extension
+                # move file to dst folder
+                shutil.move(src, dst)
+
+            # drop pictures in just the normal pictures folder
+            else:
+                # grab extension of file
+                extension = os.path.splitext(f)[1]
+                # rename file
+                dst = picDir + filename + "_" + d.strftime('%m_%d_%Y') + extension
+                # move file to dst folder
+                shutil.move(src, dst)
 
     # hold off X seconds
     time.sleep(5)
