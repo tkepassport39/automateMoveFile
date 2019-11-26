@@ -12,7 +12,7 @@
     <integer>5</integer>
 
     <key>WorkingDirectory</key>
-    <string>/Users/Passport/automation/</string>
+    <string>~/automation/</string>
 
     <key>ProgramArguments</key>
     <array>
